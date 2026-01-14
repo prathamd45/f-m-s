@@ -8,195 +8,124 @@ import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import javax.swing.*;
 
-/**
- * The class that holds the front-end connection part of the application and
- * manages the actions performed out there
- * 
- * @author Artiom
- *
- */
 public class ConnectionView {
 
-	/**
-	 * The contents of the connection window where you have to connect to a database
-	 */
-	static JFrame connectionFrame;
+    static JFrame connectionFrame;
 
-	/**
-	 * The text field that stores the login the user has written
-	 */
-	private JTextField loginField;
-	private JPasswordField passwordField;
-	private JTextField databaseUrlField;
+    private JTextField loginField;
+    private JPasswordField passwordField;
+    private JTextField databaseUrlField;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				// Reading messages in dependance of the selected language(by default ENG)
-				Translator.setLanguage(Language.ENG);
-				Translator.getMessagesFromXML();
+    public static void main(String[] args) {
 
-				try {
-					ConnectionView window = new ConnectionView();
-					window.connectionFrame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+        // Detect headless environment (Docker/K8s)
+        if (java.awt.GraphicsEnvironment.isHeadless()) {
+            System.out.println("HEADLESS MODE - UI DISABLED");
 
-	/**
-	 * Create the application.
-	 */
-	public ConnectionView() {
-		initialize();
-		// Make it visible in constructor, in order to make tests in
-		// ConnectionViewTest.java work
-		connectionFrame.setVisible(true);
-	}
+            try {
+                while (true) Thread.sleep(60000);
+            } catch (InterruptedException e) { }
+            return;
+        }
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		connectionFrame = new JFrame();
-		connectionFrame.setBounds(100, 100, 640, 480);
-		connectionFrame.setResizable(false);
-		connectionFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		connectionFrame.setTitle(Translator.getValue("sms"));
+        EventQueue.invokeLater(() -> {
+            try {
+                ConnectionView window = new ConnectionView();
+                window.connectionFrame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, e.toString(), "Startup Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
 
-		// The blue-colored panel in the top part of the application
-		JPanel topPanel = new JPanel();
-		topPanel.setBackground(SystemColor.textHighlight);
-		connectionFrame.getContentPane().add(topPanel, BorderLayout.NORTH);
+    public ConnectionView() {
+        initialize();
+        connectionFrame.setVisible(true);
+    }
 
-		// The text that informs the user that they have to connect to a database
-		JLabel connectText = new JLabel(Translator.getValue("connectText"));
-		connectText.setForeground(new Color(255, 255, 255));
-		connectText.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		topPanel.add(connectText);
+    private void initialize() {
+        connectionFrame = new JFrame();
+        connectionFrame.setBounds(100, 100, 640, 480);
+        connectionFrame.setResizable(false);
+        connectionFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        connectionFrame.setTitle("Faculty Management System");
 
-		// The panel in the bottom part of the application
-		JPanel bottomPanel = new JPanel();
-		connectionFrame.getContentPane().add(bottomPanel, BorderLayout.CENTER);
+        JPanel topPanel = new JPanel();
+        topPanel.setBackground(SystemColor.textHighlight);
+        connectionFrame.getContentPane().add(topPanel, BorderLayout.NORTH);
 
-		// The text that informs the user where they have to type the login
-		JLabel loginText = new JLabel(Translator.getValue("loginText"));
-		loginText.setBounds(68, 134, 162, 25);
-		loginText.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        JLabel connectText = new JLabel("Connect to Database");
+        connectText.setForeground(Color.WHITE);
+        connectText.setFont(new Font("Tahoma", Font.BOLD, 24));
+        topPanel.add(connectText);
 
-		// The text that informs the user where they have to type the password
-		JLabel passwordText = new JLabel(Translator.getValue("passwordText"));
-		passwordText.setBounds(68, 174, 162, 25);
-		passwordText.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        JPanel bottomPanel = new JPanel();
+        connectionFrame.getContentPane().add(bottomPanel, BorderLayout.CENTER);
+        bottomPanel.setLayout(null);
 
-		// Initializes the text field where user writes the login
-		loginField = new JTextField();
-		loginField.setName("loginField");
-		loginField.setBounds(240, 139, 330, 20);
-		loginField.setColumns(10);
+        JLabel databaseUrlText = new JLabel("Database URL:");
+        databaseUrlText.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        databaseUrlText.setBounds(70, 90, 162, 25);
 
-		// Initializes the text field where user writes the password
-		passwordField = new JPasswordField();
-		passwordField.setName("passwordField");
-		passwordField.setBounds(240, 179, 330, 20);
+        databaseUrlField = new JTextField();
+        databaseUrlField.setName("databaseUrlField");
+        databaseUrlField.setText("jdbc:mysql://localhost:3306/studentsdb");
+        databaseUrlField.setBounds(240, 95, 330, 22);
 
-		// The field where user should write the database url
-		databaseUrlField = new JTextField();
-		databaseUrlField.setName("databaseUrlField");
-		databaseUrlField.setText("jdbc:mysql://localhost:3306/studentsdb");
-		databaseUrlField.setColumns(10);
-		databaseUrlField.setBounds(240, 96, 330, 20);
+        JLabel loginText = new JLabel("MySQL Username:");
+        loginText.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        loginText.setBounds(70, 135, 162, 25);
 
-		// The text that informs user where they have to write database url
-		JLabel databaseUrlText = new JLabel(Translator.getValue("databaseUrlText"));
-		databaseUrlText.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		databaseUrlText.setBounds(68, 91, 162, 25);
+        loginField = new JTextField();
+        loginField.setName("loginField");
+        loginField.setBounds(240, 140, 330, 22);
 
-		// The button that changes the langauge of the application
-		JButton changeLanguageButton = new JButton(Translator.getValue("changeLanguage"));
+        JLabel passwordText = new JLabel("MySQL Password:");
+        passwordText.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        passwordText.setBounds(70, 175, 162, 25);
 
-		// Actions to perform when "Change language" button is clicked
-		changeLanguageButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Language selectedLanguage = (Language) JOptionPane.showInputDialog(null, Translator.getValue("sms"),
-						Translator.getValue("selectLanguage"), JOptionPane.QUESTION_MESSAGE, null, Language.values(),
-						Language.ENG.toString());
+        passwordField = new JPasswordField();
+        passwordField.setName("passwordField");
+        passwordField.setBounds(240, 180, 330, 22);
 
-				if (selectedLanguage != null)
-					Translator.setLanguage(selectedLanguage);
-				else
-					return;
+        JButton connectButton = new JButton("Connect");
+        connectButton.setBounds(230, 290, 180, 40);
+        connectButton.setFont(new Font("Tahoma", Font.BOLD, 18));
+        bottomPanel.add(connectButton);
 
-				Translator.getMessagesFromXML();
+        bottomPanel.add(databaseUrlText);
+        bottomPanel.add(databaseUrlField);
+        bottomPanel.add(loginText);
+        bottomPanel.add(loginField);
+        bottomPanel.add(passwordText);
+        bottomPanel.add(passwordField);
 
-				connectionFrame.dispose();
-				new ConnectionView();
-			}
-		});
+        connectButton.addActionListener(e -> connectToDB());
+    }
 
-		changeLanguageButton.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		changeLanguageButton.setBounds(480, 365, 135, 25);
-		bottomPanel.add(changeLanguageButton);
+    private void connectToDB() {
+        if (loginField.getText().isEmpty() || databaseUrlField.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(connectionFrame, "Please fill all required fields.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-		// The button to press after the login and password were written
-		JButton connectButton = new JButton(Translator.getValue("connectButton"));
-		connectButton.setName("connectButton");
-		connectButton.setBounds(221, 290, 190, 42);
-		connectButton.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        DBHandler.setLogin(loginField.getText());
+        DBHandler.setPassword(String.valueOf(passwordField.getPassword()));
+        DBHandler.setDatabaseUrl(databaseUrlField.getText());
 
-		// Execute connection and create a table when "Connect" button pressed
-		connectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// If one of the fields are empty then warn user about it
-				if (loginField.getText().equals("") || databaseUrlField.getText().equals("")) {
-					JOptionPane.showMessageDialog(new JFrame(), Translator.getValue("fillEmptyFields"),
-							Translator.getValue("error"), JOptionPane.ERROR_MESSAGE);
-				} else {
-					// Get login, password and database url from fields and set them for database
-					// handler
-					DBHandler.setLogin(loginField.getText());
-					DBHandler.setPassword(passwordField.getText());
-					DBHandler.setDatabaseUrl(databaseUrlField.getText());
+        if (DBHandler.createTables()) {
+            JOptionPane.showMessageDialog(connectionFrame, "Connected Successfully!", "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
 
-					// If table has\hasn't been successfully created then inform the user about that
-					if (DBHandler.createTables()) {
-						JOptionPane.showMessageDialog(new JFrame(), Translator.getValue("connectionEstablished"),
-								Translator.getValue("success"), JOptionPane.INFORMATION_MESSAGE);
-
-						// Open a new window where you can manage the table and close the old one
-						ManagementView.main(null);
-						connectionFrame.dispose();
-
-					} else {
-						JOptionPane.showMessageDialog(new JFrame(), Translator.getValue("connectionNotEstablished"),
-								Translator.getValue("error"), JOptionPane.ERROR_MESSAGE);
-					}
-				}
-
-			}
-		});
-
-		bottomPanel.setLayout(null);
-		bottomPanel.add(passwordText);
-		bottomPanel.add(loginText);
-		bottomPanel.add(passwordField);
-		bottomPanel.add(loginField);
-		bottomPanel.add(connectButton);
-		bottomPanel.add(databaseUrlText);
-		bottomPanel.add(databaseUrlField);
-
-	}
+            ManagementView.main(null);
+            connectionFrame.dispose();
+        } else {
+            JOptionPane.showMessageDialog(connectionFrame, "Connection Failed!", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }

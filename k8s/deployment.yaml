@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fms-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fms
+  template:
+    metadata:
+      labels:
+        app: fms
+    spec:
+      containers:
+      - name: fms
+        image: fms-app:latest
+        imagePullPolicy: Never
+        command: ["java", "-jar", "app.jar"]
+env:
+  - name: DB_URL
+    value: "jdbc:mysql://mysql:3306/studentsdb"
+  - name: DB_USER
+    value: "root"
+  - name: DB_PASSWORD
+    value: "root"
