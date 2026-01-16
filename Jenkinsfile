@@ -33,7 +33,9 @@ pipeline {
         }
 
         stage('Docker Login & Push') {
-            
+            when {
+                expression { return false }
+            }
             steps {
                 bat 'docker login -u "%DOCKERHUB_USER%" -p "%DOCKERHUB_PASS%"'
                 bat 'docker tag %DOCKER_IMAGE%:latest %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
