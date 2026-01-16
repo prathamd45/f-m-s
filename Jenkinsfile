@@ -15,19 +15,19 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                bat 'mvn clean package -DskipTests'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t ${DOCKER_IMAGE} .'
+                bat "docker build -t %DOCKER_IMAGE% ."
             }
         }
 
         stage('Run Docker Headless Check') {
             steps {
-                sh 'docker run --rm -e RUN_MODE=docker ${DOCKER_IMAGE}'
+                bat "docker run --rm -e RUN_MODE=docker %DOCKER_IMAGE%"
             }
         }
 
@@ -36,9 +36,9 @@ pipeline {
                 expression { return false }  // enable later
             }
             steps {
-                sh 'docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASS}"'
-                sh 'docker tag ${DOCKER_IMAGE}:latest ${DOCKERHUB_USER}/${DOCKER_IMAGE}:latest'
-                sh 'docker push ${DOCKERHUB_USER}/${DOCKER_IMAGE}:latest'
+                bat 'docker login -u "%DOCKERHUB_USER%" -p "%DOCKERHUB_PASS%"'
+                bat 'docker tag %DOCKER_IMAGE%:latest %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
+                bat 'docker push %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
             }
         }
 
