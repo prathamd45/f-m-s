@@ -27,7 +27,8 @@ pipeline {
 
         stage('Run Docker Headless Check') {
             steps {
-                bat 'docker run --rm --entrypoint cmd %DOCKER_IMAGE% /c "echo Health Check OK"'
+                bat 'docker run --rm --entrypoint /bin/sh fms-app -c "echo Health Check OK"'
+
             }
         }
 
