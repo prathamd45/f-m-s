@@ -37,7 +37,7 @@ pipeline {
                 expression { return false }
             }
             steps {
-                bat 'docker login -u "%DOCKERHUB_USER%" -p "%DOCKERHUB_PASS%"'
+                bat 'docker login -u "%prathamd45%" -p "%dockerpass%"'
                 bat 'docker tag %DOCKER_IMAGE%:latest %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
                 bat 'docker push %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
             }
