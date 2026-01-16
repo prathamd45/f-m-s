@@ -6,9 +6,10 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git 'https://github.com/<your-username>/<your-repo>.git'
+                git url: 'https://github.com/prathamd45/f-m-s.git', branch: 'main'
             }
         }
 
@@ -26,14 +27,13 @@ pipeline {
 
         stage('Run Docker Headless Check') {
             steps {
-                sh 'docker run --rm ${DOCKER_IMAGE}'
+                sh 'docker run --rm -e RUN_MODE=docker ${DOCKER_IMAGE}'
             }
         }
 
-        // Optional: push to Docker Hub
         stage('Docker Login & Push') {
             when {
-                expression { return false } // enable later if needed
+                expression { return false }  // enable later
             }
             steps {
                 sh 'docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASS}"'
@@ -42,11 +42,9 @@ pipeline {
             }
         }
 
-        // Deploy to Kubernetes (Minikube)
-        stage('Kubernetes Deploy') {
+        stage('Finish') {
             steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
-                sh 'kubectl apply -f k8s/service.yaml'
+                echo "Pipeline completed successfully!"
             }
         }
     }
