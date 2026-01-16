@@ -21,20 +21,19 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %DOCKER_IMAGE% ."
+                bat 'docker build -t %DOCKER_IMAGE% .'
             }
         }
 
         stage('Run Docker Headless Check') {
             steps {
-                bat sh "docker run --rm --entrypoint echo ${DOCKER_IMAGE} "Health Check OK
-
+                bat 'docker run --rm --entrypoint cmd %DOCKER_IMAGE% /c "echo Health Check OK"'
             }
         }
 
         stage('Docker Login & Push') {
             when {
-                expression { return false }  // enable later
+                expression { return false }
             }
             steps {
                 bat 'docker login -u "%DOCKERHUB_USER%" -p "%DOCKERHUB_PASS%"'
