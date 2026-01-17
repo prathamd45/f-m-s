@@ -20,22 +20,13 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            environment {
-                SCANNER_HOME = tool 'SonarQube'   // ✅ EXACT tool name
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    bat """
-                    %SCANNER_HOME%\\bin\\sonar-scanner ^
-                    -Dsonar.projectKey=f-m-s ^
-                    -Dsonar.projectName=Faculty-Management-System ^
-                    -Dsonar.branch.name=main
-                    -Dsonar.sources=src ^
-                    -Dsonar.java.binaries=target
-                    """
-                }
-            }
+    steps {
+        withSonarQubeEnv('SonarQube') {
+            bat 'mvn sonar:sonar -Dsonar.projectKey=fms -Dsonar.projectName=Faculty-Management-System'
         }
+    }
+}
+
 
         stage('Build Docker Image') {
             steps {
