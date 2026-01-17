@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "fms-app"
+        SONAR_SCANNER_HOME = tool 'SonarQube'
     }
 
     stages {
@@ -19,6 +20,20 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat """
+                    %SONAR_SCANNER_HOME%\\bin\\sonar-qube ^
+                    -Dsonar.projectKey=fms ^
+                    -Dsonar.projectName=Faculty-Management-System ^
+                    -Dsonar.sources=src ^
+                    -Dsonar.java.binaries=target
+                    """
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t %DOCKER_IMAGE% .'
@@ -28,7 +43,6 @@ pipeline {
         stage('Run Docker Headless Check') {
             steps {
                 bat 'docker run --rm --entrypoint /bin/sh fms-app -c "echo Health Check OK"'
-
             }
         }
 
@@ -37,7 +51,7 @@ pipeline {
                 expression { return false }
             }
             steps {
-                bat 'docker login -u "%prathamd45%" -p "%dockerpass%"'
+                bat 'docker login -u "%DOCKERHUB_USER%" -p "%DOCKERHUB_PASS%"'
                 bat 'docker tag %DOCKER_IMAGE%:latest %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
                 bat 'docker push %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
             }
@@ -45,7 +59,7 @@ pipeline {
 
         stage('Finish') {
             steps {
-                echo "Pipeline completed successfully!"
+                echo "Pipeline completed successfully with SonarQube analysis!"
             }
         }
     }
