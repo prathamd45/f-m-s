@@ -18,14 +18,18 @@ pipeline {
                 bat 'mvn clean package -DskipTests'
             }
         }
-
-        stage('SonarQube Analysis') {
+stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('SonarQube') {
-            bat 'mvn sonar:sonar -Dsonar.projectKey=fms -Dsonar.projectName=Faculty-Management-System'
+            bat '''
+            mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.10.0.2594:sonar ^
+            -Dsonar.projectKey=fms ^
+            -Dsonar.projectName=Faculty-Management-System
+            '''
         }
     }
 }
+
 
 
         stage('Build Docker Image') {
