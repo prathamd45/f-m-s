@@ -27,8 +27,9 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     bat """
                     %SCANNER_HOME%\\bin\\sonar-scanner ^
-                    -Dsonar.projectKey=fms ^
+                    -Dsonar.projectKey=f-m-s ^
                     -Dsonar.projectName=Faculty-Management-System ^
+                    -Dsonar.branch.name=main
                     -Dsonar.sources=src ^
                     -Dsonar.java.binaries=target
                     """
