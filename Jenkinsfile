@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "fms-app"
-        SONAR_SCANNER_HOME = tool 'SonarQube'
     }
 
     stages {
@@ -21,10 +20,13 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            environment {
+                SCANNER_HOME = tool 'sonarqube'   // ✅ EXACT tool name
+            }
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('sonarqube') {
                     bat """
-                    %SONAR_SCANNER_HOME%\\bin\\sonar-qube ^
+                    %SCANNER_HOME%\\bin\\sonar-scanner ^
                     -Dsonar.projectKey=fms ^
                     -Dsonar.projectName=Faculty-Management-System ^
                     -Dsonar.sources=src ^
@@ -43,17 +45,6 @@ pipeline {
         stage('Run Docker Headless Check') {
             steps {
                 bat 'docker run --rm --entrypoint /bin/sh fms-app -c "echo Health Check OK"'
-            }
-        }
-
-        stage('Docker Login & Push') {
-            when {
-                expression { return false }
-            }
-            steps {
-                bat 'docker login -u "%DOCKERHUB_USER%" -p "%DOCKERHUB_PASS%"'
-                bat 'docker tag %DOCKER_IMAGE%:latest %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
-                bat 'docker push %DOCKERHUB_USER%/%DOCKER_IMAGE%:latest'
             }
         }
 
