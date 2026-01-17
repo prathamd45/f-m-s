@@ -21,10 +21,10 @@ pipeline {
 
         stage('SonarQube Analysis') {
             environment {
-                SCANNER_HOME = tool 'sonarqube'   // ✅ EXACT tool name
+                SCANNER_HOME = tool 'SonarQube'   // ✅ EXACT tool name
             }
             steps {
-                withSonarQubeEnv('sonarqube') {
+                withSonarQubeEnv('SonarQube') {
                     bat """
                     %SCANNER_HOME%\\bin\\sonar-scanner ^
                     -Dsonar.projectKey=fms ^
